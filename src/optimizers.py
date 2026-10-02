@@ -168,7 +168,6 @@ class GradientDescent(Optimizer):
         Evaluate function and gradient based on the input w.
         w is not necessarily the current parameter value.
         For vanilla gradient descent and line search, this is simply pass-through.
-        For proximal and more advanced gradient methods, extra terms are introduced.
         """
         return self.fun_obj.evaluate(w, *self.fun_obj_args)
 
@@ -181,45 +180,10 @@ class GradientDescent(Optimizer):
         self.g_old = None
 
 
-class GradientDescentHeavyBall(GradientDescent):
-    def __init__(
-        self,
-        momentum,
-        optimal_tolerance=1e-2,
-        learning_rate=1e-3,
-        max_evals=100,
-        verbose=False,
-    ):
-        self.momentum = momentum
-        self.parameters = None
-        self.optimal_tolerance = optimal_tolerance
-        self.learning_rate = learning_rate
-        self.initial_learning_rate = learning_rate  # for resetting
-        self.max_evals = max_evals
-        self.num_evals = 0
-        self.verbose = verbose
-
-        # Keep f and g as state variables to reduce redundancy
-        self.f_old = None
-        self.g_old = None
-        self.w_old = None
-
-    def get_learning_rate_and_step(self, f_old, g_old):
-        w = self.parameters
-        alpha = self.learning_rate
-        if self.w_old is None:
-            w_new = w - alpha * g_old
-        else:
-            w_new = w - alpha * g_old + self.momentum * (w - self.w_old)
-        f_new, g_new = self.get_function_value_and_gradient(w_new)
-        return w_new, f_new, g_new
-
-
 class GradientDescentLineSearch(GradientDescent):
     """
-    You *don't* need to understand this code.
-    An advanced version of gradient descent, using backtracking line search
-    to automate finding a good step size. Take CPSC 406 for more information!
+    Gradient descent with backtracking (Armijo) line search, which picks the
+    step size automatically instead of using a fixed learning rate.
     """
 
     def __init__(
@@ -298,7 +262,6 @@ class GradientDescentLineSearch(GradientDescent):
     def get_backtracked_alpha(self, f_new, f_old, alpha, *multiplier_ingredients):
         """
         Our line search implementation reduces step size based on gradient's L2 norm
-        Proximal gradient method just cuts it in half.
         """
         gg, gtd = multiplier_ingredients
         left = f_new - f_old
@@ -308,88 +271,9 @@ class GradientDescentLineSearch(GradientDescent):
     def backtracking_break_yes(self, f_new, f_old, alpha, *multiplier_ingredients):
         """
         Our default Armijo search uses gradient's squared L2 norm as multiplier.
-        Proximal gradient will use dot product between
-        gradient g and parameter displacement (w_new - w_old) as multiplier.
         """
         gg, gtd = multiplier_ingredients
         return f_new <= f_old - self.gamma * alpha * gg
-
-
-class GradientDescentLineSearchProxL1(GradientDescentLineSearch):
-    """
-    You *don't* need to understand this code.
-    An implementation of proximal gradient method for enabling L1 regularization.
-    The input function object should be just the desired loss term *without penalty*.
-    """
-
-    def __init__(
-        self, lammy, optimal_tolerance=1e-2, gamma=1e-4, max_evals=1000, verbose=False
-    ):
-        """
-        Note that lammy is passed to the optimizer, not the function object.
-        """
-        super().__init__(
-            optimal_tolerance=optimal_tolerance,
-            gamma=gamma,
-            max_evals=max_evals,
-            verbose=verbose,
-        )
-        self.lammy = lammy
-
-    def get_backtracked_alpha(self, f_new, f_old, alpha, *multiplier_ingredients):
-        """
-        Proximal gradient method just cuts it in half.
-        """
-        return alpha / 2.0
-
-    def get_next_parameter_value(self, alpha, g):
-        """
-        For proximal gradient for L1 regularization, first make a vanilla GD step,
-        and then apply proximal operator.
-        """
-        w_new = super().get_next_parameter_value(alpha, g)
-        w_proxed = self._get_prox_l1(w_new, alpha)
-        return w_proxed
-
-    def backtracking_break_yes(self, f_new, f_old, alpha, *multiplier_ingredients):
-        """
-        Our default Armijo search uses gradient's squared L2 norm as multiplier.
-        Proximal gradient will use Wolfe condition. Use dot product between
-        gradient g and parameter displacement (w_new - w_old) as multiplier.
-        f_new and f_old already incorporate L1 regularization.
-        """
-        gg, gtd = multiplier_ingredients
-        return f_new <= f_old - self.gamma * alpha * gtd
-
-    def get_function_value_and_gradient(self, w):
-        """
-        Evaluate f and then add the L1 regularization term.
-        Don't mutate g here.
-        """
-        f, g = super().get_function_value_and_gradient(w)
-        f += self.lammy * np.sum(np.abs(w))
-        return f, g
-
-    def break_yes(self, g):
-        w = self.parameters
-        optimal_condition = norm(w - self._get_prox_l1(w - g, 1.0), float("inf"))
-        if optimal_condition < self.optimal_tolerance:
-            if self.verbose:
-                print(
-                    f"Problem solved "
-                    f"up to optimality tolerance {self.optimal_tolerance:.3f} "
-                    f"with {self.num_evals} function evals"
-                )
-            return True
-        elif self.num_evals >= self.max_evals:
-            if self.verbose:
-                print(f"Reached max number of function evals {self.max_evals}")
-            return True
-        else:
-            return False
-
-    def _get_prox_l1(self, w, alpha):
-        return np.sign(w) * np.maximum(np.abs(w) - self.lammy * alpha, 0)
 
 
 class StochasticGradient(Optimizer):

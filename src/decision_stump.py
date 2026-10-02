@@ -6,7 +6,8 @@ class DecisionStumpEquality:
     This is a decision stump that branches on whether the value of X is
     "almost equal to" some threshold.
 
-    This probably isn't a thing you want to actually do, it's just an example.
+    It is a simple baseline: rounding makes continuous features behave like
+    categories, which is why it does poorly on continuous data.
     """
 
     y_hat_yes = None

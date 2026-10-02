@@ -1,32 +1,6 @@
 import numpy as np
 
 
-# helper functions to transform between one big vector of weights
-# and a list of layer parameters of the form (W,b)
-def flatten_weights(weights):
-    return np.concatenate([w.flatten() for w in sum(weights, ())])
-
-
-def unflatten_weights(weights_flat, layer_sizes):
-    weights = list()
-    counter = 0
-    for i in range(len(layer_sizes) - 1):
-        W_size = layer_sizes[i + 1] * layer_sizes[i]
-        b_size = layer_sizes[i + 1]
-
-        W = np.reshape(
-            weights_flat[counter : counter + W_size],
-            (layer_sizes[i + 1], layer_sizes[i]),
-        )
-        counter += W_size
-
-        b = weights_flat[counter : counter + b_size][None]
-        counter += b_size
-
-        weights.append((W, b))
-    return weights
-
-
 class NeuralNet:
     """
     A neural network is an encoder and a linear model trained at the same time.
@@ -42,9 +16,9 @@ class NeuralNet:
         one for backpropagation of derivatives into weights and biases and
         one for the final layer prediction.
 
-        For A6, encoder should be a MultiLayerEncoder instance. See encoders.py.
+        encoder should be a NonLinearEncoderMultiLayer instance. See encoders.py.
         More sophisticated encoders like convolutional neural networks and recurrent neural networks
-        are very tricky to implement without automtaic differentiation, which is our topic for A7.
+        are very tricky to implement without automatic differentiation.
         """
         self.loss_fn = loss_fn
         self.optimizer = optimizer
@@ -65,9 +39,6 @@ class NeuralNet:
             ]
         )
         f, g = self.loss_fn.evaluate(w_init, X, y)
-
-        # utils.check_gradient(self, X, y, len(weights_flat), epsilon=1e-6)
-        # weights_flat_new, f = findMin.findMin(self.funObj, weights_flat, self.max_iter, X, y, verbose=True)
 
         self.optimizer.reset()
         self.optimizer.set_fun_obj(self.loss_fn)

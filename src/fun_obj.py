@@ -1,10 +1,9 @@
 import numpy as np
-from numpy.linalg.linalg import norm
-from scipy.optimize.optimize import approx_fprime
+from scipy.optimize import approx_fprime
 from scipy.special import logsumexp
 
 
-from utils import ensure_1d, euclidean_dist_squared, shortest_dist
+from utils import ensure_1d
 
 """
 Implementation of function objects.
@@ -45,7 +44,7 @@ def unflatten_weights(weights_flat, layer_sizes):
 
 def log_sum_exp(Z):
     Z_max = np.max(Z, axis=1)
-    return Z_max + np.log(np.sum(np.exp(Z - Z_max[:, None]), axis=1))  # per-colmumn max
+    return Z_max + np.log(np.sum(np.exp(Z - Z_max[:, None]), axis=1))  # subtract the row max for numerical stability
 
 
 class FunObj:
@@ -194,42 +193,12 @@ class LogisticRegressionLossL2(LogisticRegressionLoss):
         self.lammy = lammy
 
     def evaluate(self, w, X, y):
-        # we sure did copy-paste this a bunch of times;
-        # it'd be better to define some kind of generic L2 regularization
-        # class and allow for adding function objects together,
-        # but oh well.
         w = ensure_1d(w)
         y = ensure_1d(y)
 
         f_base, g_base = super().evaluate(w, X, y)
         f = f_base + (self.lammy / 2) * (w @ w)
         g = g_base + self.lammy * w
-        return f, g
-
-
-class KernelLogisticRegressionLoss(FunObj):
-    def __init__(self, lammy):
-        self.lammy = lammy
-
-    def evaluate(self, u, K, y):
-        """
-        Here u is the length-n vector defining our linear combination in
-        the (potentially infinite-dimensional) Z space,
-        and K is the Gram matrix K[i, i'] = k(x_i, x_{i'}).
-
-        Note the L2 regularizer is in the transformed space too, not on u.
-        """
-        u = ensure_1d(u)
-        y = ensure_1d(y)
-
-        yKu = y * (K @ u)
-
-        f = np.logaddexp(0, -yKu).sum() + (self.lammy / 2) * u @ K @ u
-
-        with np.errstate(over="ignore"):  # overflowing here is okay: we get 0
-            g_bits = -y / (1 + np.exp(yKu))
-        g = K @ g_bits + self.lammy * K @ u
-
         return f, g
 
 
@@ -326,46 +295,6 @@ class PCAFactorsLoss(FunObj):
         return f, g.flatten()
 
 
-class CollaborativeFilteringZLoss(FunObj):
-    def __init__(self, lammyZ=1, lammyW=1):
-        self.lammyZ = lammyZ
-        self.lammyW = lammyW
-
-    def evaluate(self, z, W, X):
-        n, d = X.shape
-        k, _ = W.shape
-        Z = z.reshape(n, k)
-
-        R_raw = Z @ W - X
-        mask = ~np.isnan(R_raw)
-        R = np.zeros_like(X)
-        R[mask] = R_raw[mask]
-
-        f = np.sum(R ** 2) / 2 + np.sum(self.lammyZ * Z ** 2) / 2 + np.sum(self.lammyW * W ** 2) /2   
-        g = R @ W.T + self.lammyZ * Z
-        return f, g.flatten()
-
-
-
-class CollaborativeFilteringWLoss(FunObj):
-    def __init__(self, lammyZ=1, lammyW=1):
-        self.lammyZ = lammyZ
-        self.lammyW = lammyW
-
-    def evaluate(self, w, Z, X):
-        n, d = X.shape
-        _, k = Z.shape
-        W = w.reshape(k, d)
-
-        R_raw = Z @ W - X
-        mask = ~np.isnan(R_raw)
-        R = np.zeros_like(X)
-        R[mask] = R_raw[mask]
-        
-        f = np.sum(R ** 2) / 2 + np.sum(self.lammyZ * Z ** 2) / 2 + np.sum(self.lammyW * W ** 2) /2 
-        g = Z.T @ R + self.lammyW * W 
-        return f, g.flatten()
-
 class RobustPCAFeaturesLoss(FunObj):
     def __init__(self, epsilon):
         self.epsilon = epsilon
@@ -396,7 +325,7 @@ class RobustPCAFactorsLoss(FunObj):
         return f, g.flatten()
 
 
-class MLPLoss(FunObj):  # (friendship is magic)
+class MLPLoss(FunObj):
     """
     Function object for generic multi-layer perceptron
     (aka fully-connected artificial neural networks)

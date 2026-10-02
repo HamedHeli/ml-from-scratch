@@ -143,28 +143,3 @@ class LinearModelMultiOutput:
 
     def predict(self, X):
         return X @ self.W.T + self.b
-
-class KernelClassifier(LinearClassifier):
-    def __init__(self, loss_fn, optimizer, kernel, check_correctness=False):
-        """
-        Make sure loss_fn is kernel-compatible!
-        """
-        super().__init__(loss_fn, optimizer, check_correctness=check_correctness)
-        self.kernel = kernel
-
-    def fit(self, X, y):
-        """
-        For any choice of kernel, evaluate the Gram matrix first,
-        and then run logistic regression.
-        """
-        self.X = X
-        K = self.kernel(X, self.X)
-        super().fit(K, y)
-
-    def predict(self, X_pred):
-        if self.X is None:
-            raise ValueError("Must run fit() before predict()")
-
-        K_pred = self.kernel(X_pred, self.X)
-        return super().predict(K_pred)
-

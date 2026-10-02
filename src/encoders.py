@@ -1,7 +1,6 @@
 import numpy as np
 
 """
-Changed name from compressors to encoders in A6.
 Contains class definitions related to latent factor models, whose behaviours are
 encapsulated by the "learned encoders", which are objects implementing encode() method.
 """
@@ -75,9 +74,8 @@ class LinearEncoderGradient(LinearEncoder):
         k is the number of factors.
         The function objects are assumed to implement evaluate(parameters, X, k),
         where k is the number of factors.
-        Each function object may use different optimizers as well,
-        e.g. proximal gradient for W to encourage sparsity.
-        The optimizers themselves will stay unchanged from previous assignments,
+        Each function object may use a different optimizer as well.
+        The optimizers work on flat parameter vectors,
         meaning we must reshape and concatenate our gradients carefully.
         """
         self.k = k
