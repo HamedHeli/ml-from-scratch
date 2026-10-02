@@ -1,20 +1,20 @@
 # Machine Learning From Scratch
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hamedheli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hamedheli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb) [![View in nbviewer](https://img.shields.io/badge/view%20in-nbviewer-orange)](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb)
 
 Implementations of core machine learning algorithms written with NumPy instead of high-level libraries: k-nearest neighbours, decision trees, gradient descent and SGD, a neural network with hand-written backpropagation, and PCA / robust PCA.
 
-**Start with the notebook: [`notebooks/ml-from-scratch.ipynb`](notebooks/ml-from-scratch.ipynb).** It runs each model on real data, shows the results, and explains what they mean.
+**Start with the notebook: [`notebooks/ml-from-scratch.ipynb`](notebooks/ml-from-scratch.ipynb).** It runs each model on real data, shows the results, and explains what they mean. GitHub's notebook preview doesn't support jumping to sections, so the topic links below open the notebook on nbviewer instead.
 
 ## Highlights
 
 | Topic | What's implemented | Result |
 |---|---|---|
-| k-Nearest Neighbours | Vectorized pairwise distances, k-NN classifier, 10-fold cross-validation written by hand | 6.5% test error on US cities, vs. 16.1% for a depth-5 decision tree |
-| Decision Trees | Equality, error-rate and information-gain splitting rules; recursive tree | Training error matches scikit-learn's entropy tree at every depth |
-| Stochastic Gradient Descent | Gradient descent, Armijo line search, mini-batch SGD, four learning-rate schedules | Shows why a constant step never converges and why $c/t^2$ stops too early |
-| Neural Networks | Multi-layer perceptron with sigmoid layers, softmax loss, backpropagation, L2 regularization | ~95% validation accuracy on MNIST; visualizes how hidden layers make non-linear data separable |
-| PCA and Robust PCA | PCA via SVD; L1 robust PCA via alternating gradient descent | 2-D map of 50 animals from 85 traits; separates moving cars from the background in traffic video |
+| [k-Nearest Neighbours](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb#1-k-nearest-neighbours) | Vectorized pairwise distances, k-NN classifier, 10-fold cross-validation written by hand | 6.5% test error on US cities, vs. 16.1% for a depth-5 decision tree |
+| [Decision Trees](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb#2-decision-trees) | Equality, error-rate and information-gain splitting rules; recursive tree | Training error matches scikit-learn's entropy tree at every depth |
+| [Stochastic Gradient Descent](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb#3-stochastic-gradient-descent) | Gradient descent, Armijo line search, mini-batch SGD, four learning-rate schedules | Shows why a constant step never converges and why $c/t^2$ stops too early |
+| [Neural Networks](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb#4-neural-networks) | Multi-layer perceptron with sigmoid layers, softmax loss, backpropagation, L2 regularization | ~95% validation accuracy on MNIST; visualizes how hidden layers make non-linear data separable |
+| [PCA and Robust PCA](https://nbviewer.org/github/HamedHeli/ml-from-scratch/blob/main/notebooks/ml-from-scratch.ipynb#5-pca-and-robust-pca) | PCA via SVD; L1 robust PCA via alternating gradient descent | 2-D map of 50 animals from 85 traits; separates moving cars from the background in traffic video |
 
 ## Repository layout
 
