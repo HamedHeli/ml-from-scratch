@@ -28,8 +28,12 @@ def evalModel(model, X, y):
     plt.show()
 
 
+# data/ sits at the repository root, next to this common/ folder
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
 def load_dataset(filename):
-    with open(Path("..", "data", filename).with_suffix(".pkl"), "rb") as f:
+    with open((DATA_DIR / filename).with_suffix(".pkl"), "rb") as f:
         return pickle.load(f)
 
 

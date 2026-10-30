@@ -5,7 +5,7 @@ from numpy.linalg import norm
 Implementation of optimizers, following the design pattern of PyTorch,
 a popular library for differentiable programming and optimization.
 
-Optimizers are used with function objects. See fun_obj.py.
+Optimizers are used with function objects. See ../common/fun_obj.py.
 """
 
 

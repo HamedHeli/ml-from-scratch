@@ -11,7 +11,7 @@ class LinearModel:
     and optimizers.
 
     See optimizers.py for optimizers.
-    See fun_obj.py for loss function objects, which must implement evaluate()
+    See ../common/fun_obj.py for loss function objects, which must implement evaluate()
     and return f and g values corresponding to current parameters.
     """
 

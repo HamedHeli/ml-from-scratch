@@ -13,7 +13,7 @@ f, the function value (scalar) and
 g, the gradient (vector).
 
 Function objects are used with optimizers to navigate the parameter space and
-to find the optimal parameters (vector). See optimizers.py.
+to find the optimal parameters (vector). See ../03-gradient-descent/optimizers.py.
 """
 
 
