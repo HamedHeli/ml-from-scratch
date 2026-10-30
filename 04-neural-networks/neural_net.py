@@ -16,7 +16,7 @@ class NeuralNet:
         one for backpropagation of derivatives into weights and biases and
         one for the final layer prediction.
 
-        encoder should be a NonLinearEncoderMultiLayer instance. See encoders.py.
+        encoder should be a NonLinearEncoderMultiLayer instance. See layers.py.
         More sophisticated encoders like convolutional neural networks and recurrent neural networks
         are very tricky to implement without automatic differentiation.
         """
